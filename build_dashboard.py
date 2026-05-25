@@ -1046,6 +1046,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 .map(cols => Object.fromEntries(headers.map((h, idx) => [h, (cols[idx] || '').trim()])));
         }
 
+        function normalizeInscriptionNumber(value, fallback) {
+            const rawValue = (value || fallback || '').toString().trim();
+            if (!rawValue) return fallback;
+            return /^\d+$/.test(rawValue) ? rawValue.replace(/^0+(?=\d)/, '') : rawValue;
+        }
+
         function normalizeRecord(row, idx) {
             const normalizeUpper = (value, fallback) => {
                 const normalized = (value || fallback || '').trim().toUpperCase();
@@ -1057,7 +1063,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             return {
                 id: idx + 1,
-                inscricao: row['NÚM. INSCRIÇÃO'] || row['N'] || idx + 1,
+                inscricao: normalizeInscriptionNumber(row['NÚM. INSCRIÇÃO'], row['N'] || idx + 1),
                 nome: capitalizePortuguese(row['NOME COMPLETO'] || ''),
                 nome_social: '',
                 status: normalizeUpper(row['STATUS DA INSCRIÇÃO'], 'INSCRITO'),
